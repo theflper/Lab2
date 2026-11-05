@@ -1,0 +1,25 @@
+//{{NO_DEPENDENCIES}}
+// Microsoft Visual C++ generated include file.
+// Used by Lab2.rc
+//
+#define IDD_ABOUTBOX                    100
+#define IDP_OLE_INIT_FAILED             100
+#define IDR_MAINFRAME                   128
+#define IDR_Lab2TYPE                    130
+#define IDR_RCDATA1                     310
+#define IDR_RCDATA2                     311
+#define IDR_RCDATA3                     312
+#define IDR_ACCELERATOR1                313
+#define IDR_RCDATA4                     314
+#define IDR_RCDATA5                     315
+
+// Next default values for new objects
+// 
+#ifdef APSTUDIO_INVOKED
+#ifndef APSTUDIO_READONLY_SYMBOLS
+#define _APS_NEXT_RESOURCE_VALUE        316
+#define _APS_NEXT_COMMAND_VALUE         32772
+#define _APS_NEXT_CONTROL_VALUE         1000
+#define _APS_NEXT_SYMED_VALUE           310
+#endif
+#endif
