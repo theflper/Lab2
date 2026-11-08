@@ -56,17 +56,12 @@ BOOL CLab2View::PreCreateWindow(CREATESTRUCT& cs)
 
 namespace
 {
-	DWORD transformMode(LPCTSTR multiplication)
+	DWORD transformMode(bool right)
 	{
-		if (multiplication == nullptr)
-			return 0;
-
-		if (_tcscmp(multiplication, _T("left")) == 0)
-			return MWT_LEFTMULTIPLY;
-
-		if (_tcscmp(multiplication, _T("right")) == 0)
+		if (right)
 			return MWT_RIGHTMULTIPLY;
-		return 0;
+
+		return MWT_LEFTMULTIPLY;
 	}
 	void crtaj_kaktus(CDC* pDC, UINT resourceId)
 	{
@@ -129,17 +124,17 @@ void CLab2View::crtaj_tamni_kaktus(CDC* pDC)
 }
 void CLab2View::crtaj_rotiran_tamni_kaktus(CDC* pDC,double angle) {
 	PushTransformacija(pDC);
-	Rotate(pDC, angle, _T("left"));
-	Translate(pDC, -10.0f, -74.0f, _T("left"));
-	Scale(pDC, 0.08f, 0.33f, _T("left"));
+	Rotate(pDC, angle, false);
+	Translate(pDC, -10.0f, -74.0f, false);
+	Scale(pDC, 0.08f, 0.33f, false);
 	crtaj_tamni_kaktus(pDC);
 	PopTransformacija(pDC);
 }
 void CLab2View::crtaj_rotiran_deblji_tamni_kaktus(CDC* pDC, double angle) {
 	PushTransformacija(pDC);
-	Rotate(pDC, angle, _T("left"));
-	Translate(pDC, -17.0f, -75.0f, _T("left"));
-	Scale(pDC, 0.15f, 0.33f, _T("left"));
+	Rotate(pDC, angle, false);
+	Translate(pDC, -17.0f, -75.0f, false);
+	Scale(pDC, 0.15f, 0.33f, false);
 	crtaj_tamni_kaktus(pDC);
 	PopTransformacija(pDC);
 }
@@ -161,22 +156,22 @@ void CLab2View::crtaj_saksiju(CDC* pDC)
 	olovka.DeleteObject();
 	cetka.DeleteObject();
 }
-BOOL CLab2View::Scale(CDC* pDC, float scaleX, float scaleY, LPCTSTR multiplication)
+BOOL CLab2View::Scale(CDC* pDC, float scaleX, float scaleY, bool right)
 {
-	DWORD mode = transformMode(multiplication);
-	if (pDC == nullptr || mode == 0)
+	if (pDC == nullptr)
 		return FALSE;
+	DWORD mode = transformMode(right);
 
 	XFORM transform = { scaleX, 0.0f, 0.0f, scaleY, 0.0f, 0.0f };
 	pDC->SetGraphicsMode(GM_ADVANCED);
 	return primeniTransformaciju(pDC, transform, mode);
 }
 
-BOOL CLab2View::Rotate(CDC* pDC, float angle, LPCTSTR multiplication)
+BOOL CLab2View::Rotate(CDC* pDC, float angle, bool right)
 {
-	DWORD mode = transformMode(multiplication);
-	if (pDC == nullptr || mode == 0)
+	if (pDC == nullptr)
 		return FALSE;
+	DWORD mode = transformMode(right);
 
 	const float radians = angle * 3.14159265358979323846f / 180.0f;
 	const float cosine = std::cos(radians);
@@ -186,11 +181,11 @@ BOOL CLab2View::Rotate(CDC* pDC, float angle, LPCTSTR multiplication)
 	return primeniTransformaciju(pDC, transform, mode);
 }
 
-BOOL CLab2View::Translate(CDC* pDC, float offsetX, float offsetY, LPCTSTR multiplication)
+BOOL CLab2View::Translate(CDC* pDC, float offsetX, float offsetY, bool right)
 {
-	DWORD mode = transformMode(multiplication);
-	if (pDC == nullptr || mode == 0)
+	if (pDC == nullptr)
 		return FALSE;
+	DWORD mode = transformMode(right);
 
 	XFORM transform = { 1.0f, 0.0f, 0.0f, 1.0f, offsetX, offsetY };
 	pDC->SetGraphicsMode(GM_ADVANCED);
@@ -214,72 +209,66 @@ void CLab2View::PopTransformacija(CDC* pDC)
 	transformStack.pop_back();
 }
 
-void CLab2View::OnDraw(CDC* pDC)
+void CLab2View::DrawFigure(CDC* pDC)
 {
-	CLab2Doc* pDoc = GetDocument();
-	ASSERT_VALID(pDoc);
-	if (!pDoc)
-		return;
-	pDC->FillSolidRect(CRect(0, 0, 500, 500), RGB(135, 206, 235));
-
 	transformStack.clear();
 	int previousMode = pDC->SetGraphicsMode(GM_ADVANCED);
 	//pocetak kaktusa
 	PushTransformacija(pDC);
-	Translate(pDC, 250.0f, 425.0f, _T("left"));
+	Translate(pDC, 250.0f, 425.0f, false);
 
 	//centar rotacije1
 	PushTransformacija(pDC);
-	Rotate(pDC, (float)ugao2, _T("left"));
+	Rotate(pDC, (float)ugao2, false);
 	//crtanje prvog dela kaktusa
 	PushTransformacija(pDC);
 	PushTransformacija(pDC);
-	Scale(pDC, 0.25f, 0.31f, _T("left"));
-	Translate(pDC, -107.0f, -227.0f, _T("left"));
+	Scale(pDC, 0.25f, 0.31f, false);
+	Translate(pDC, -107.0f, -227.0f, false);
 	crtaj_svetli_kaktus(pDC);
 	//Vrati se na pocetno stanje kaktusa
 	PopTransformacija(pDC);
 	crtaj_krug(pDC, 0, 0, 10);
 	//sledeci krug centar
-	Translate(pDC, 0.0f, -75.0f, _T("left"));
+	Translate(pDC, 0.0f, -75.0f, false);
 	//sledeci deo
 	crtaj_rotiran_tamni_kaktus(pDC, 0.0f);
 	crtaj_rotiran_tamni_kaktus(pDC,45.0f);
 	crtaj_rotiran_tamni_kaktus(pDC,-45.0f);
 	crtaj_krug(pDC, 0, 0, 10);
 	//dalja translacija na levo i gore
-	Translate(pDC, -55.0f, -55.0f, _T("left"));
+	Translate(pDC, -55.0f, -55.0f, false);
 	crtaj_rotiran_deblji_tamni_kaktus(pDC, 0.0f);
 	crtaj_rotiran_deblji_tamni_kaktus(pDC, -90.0f);
 	crtaj_krug(pDC, 0, 0, 10);
 	//gornji kaktus
-	Translate(pDC, 0.0f, -75.0f, _T("left"));
+	Translate(pDC, 0.0f, -75.0f, false);
 	//crtanje najdebljeg kaktusa
 	PushTransformacija(pDC);
-	Translate(pDC, -24.0f, -66.0f, _T("left"));
-	Scale(pDC, 0.23f, 0.28f, _T("left"));
+	Translate(pDC, -24.0f, -66.0f, false);
+	Scale(pDC, 0.23f, 0.28f, false);
 	crtaj_tamni_kaktus(pDC);
 	PopTransformacija(pDC);
 	crtaj_krug(pDC, 0, 0, 10);
 	//druga strana
-	Translate(pDC, 110.0f, 75.0f, _T("left"));//100 je izmedju ali je jedan 5 levo drugi 5 desno to je jos 10
+	Translate(pDC, 110.0f, 75.0f, false);//100 je izmedju ali je jedan 5 levo drugi 5 desno to je jos 10
 	crtaj_rotiran_deblji_tamni_kaktus(pDC, 90.0);
 	//zadnje grane i krug
-	Translate(pDC, 75.0f, 0.0f, _T("left"));
+	Translate(pDC, 75.0f, 0.0f, false);
 	crtaj_rotiran_deblji_tamni_kaktus(pDC, 45.0f);
 	crtaj_rotiran_deblji_tamni_kaktus(pDC, 135.0f);
 	crtaj_krug(pDC, 0, 0, 10);
 	PopTransformacija(pDC);//vracanje na pocetak
 	crtaj_krug(pDC, 0, 0, 10);
 	//nova translacija
-	Translate(pDC, 55.0f, -130.0f, _T("left"));
+	Translate(pDC, 55.0f, -130.0f, false);
 	// Rotacija cele grupe oko tacke (305, 295)
-	Rotate(pDC, (float)ugao1, _T("left"));
+	Rotate(pDC, (float)ugao1, false);
 	// Konkretna grana
 	PushTransformacija(pDC);
-	Translate(pDC, 15.0f, -5.0f, _T("left"));
-	Scale(pDC, 0.15f, 0.3f, _T("left"));
-	Rotate(pDC, -180.0f, _T("left"));
+	Translate(pDC, 15.0f, -5.0f, false);
+	Scale(pDC, 0.15f, 0.3f, false);
+	Rotate(pDC, -180.0f, false);
 	crtaj_svetli_kaktus(pDC);
 	// Povratak sa transformacije centra
 	PopTransformacija(pDC);
@@ -291,11 +280,15 @@ void CLab2View::OnDraw(CDC* pDC)
 
 
 	PushTransformacija(pDC);
-	Translate(pDC, 190.0f, 430.0f, _T("left"));
+	Translate(pDC, 190.0f, 430.0f, false);
 	crtaj_saksiju(pDC);
 	PopTransformacija(pDC);
 
 	pDC->SetGraphicsMode(previousMode);
+}
+
+void CLab2View::DrawGrid(CDC* pDC)
+{
 	if (grid)
 	{
 		CPen gridPen(PS_SOLID, 1, RGB(255, 255, 255));
@@ -311,6 +304,18 @@ void CLab2View::OnDraw(CDC* pDC)
 		pDC->SelectObject(pOldPen);
 		gridPen.DeleteObject();
 	}
+}
+
+void CLab2View::OnDraw(CDC* pDC)
+{
+	CLab2Doc* pDoc = GetDocument();
+	ASSERT_VALID(pDoc);
+	if (!pDoc)
+		return;
+
+	pDC->FillSolidRect(CRect(0, 0, 500, 500), RGB(135, 206, 235));
+	DrawFigure(pDC);
+	DrawGrid(pDC);
 }
 
 

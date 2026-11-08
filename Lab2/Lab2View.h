@@ -40,11 +40,13 @@ public:
 	void crtaj_rotiran_tamni_kaktus(CDC* pDC,double angle);
 	void crtaj_rotiran_deblji_tamni_kaktus(CDC* pDC, double angle);
 	void crtaj_krug(CDC* pDC, int x, int y, int r);
-	BOOL Scale(CDC* pDC, float scaleX, float scaleY, LPCTSTR multiplication);
-	BOOL Rotate(CDC* pDC, float angle, LPCTSTR multiplication);
-	BOOL Translate(CDC* pDC, float offsetX, float offsetY, LPCTSTR multiplication);
+	BOOL Scale(CDC* pDC, float scaleX, float scaleY, bool right);
+	BOOL Rotate(CDC* pDC, float angle, bool right);
+	BOOL Translate(CDC* pDC, float offsetX, float offsetY, bool right);
 	void PushTransformacija(CDC* pDC);
 	void PopTransformacija(CDC* pDC);
+	void DrawFigure(CDC* pDC);
+	void DrawGrid(CDC* pDC);
 #ifdef _DEBUG
 	virtual void AssertValid() const;
 	virtual void Dump(CDumpContext& dc) const;
