@@ -63,18 +63,25 @@ namespace
 
 		return MWT_LEFTMULTIPLY;
 	}
-	void crtaj_kaktus(CDC* pDC, UINT resourceId)
+	CString putanjaDoFajla(LPCTSTR imeFajla)
 	{
-		HINSTANCE hInstance = AfxGetResourceHandle();
-		HRSRC hRes = FindResource(hInstance, MAKEINTRESOURCE(resourceId), RT_RCDATA);
-		if (hRes == NULL)
-			return;
-		HGLOBAL hData = LoadResource(hInstance, hRes);
-		if (hData == NULL)
-			return;
-		LPVOID pData = LockResource(hData);
-		DWORD dataSize = SizeofResource(hInstance, hRes);
-		HENHMETAFILE hEmf = SetEnhMetaFileBits(dataSize, static_cast<BYTE*>(pData));
+		TCHAR exePutanja[MAX_PATH] = {};
+		DWORD duzina = GetModuleFileName(nullptr, exePutanja, MAX_PATH);
+		if (duzina == 0)
+			return CString();
+
+		CString putanja(exePutanja, static_cast<int>(duzina));
+		int poslednjaKosaCrta = putanja.ReverseFind(_T('\\'));
+		if (poslednjaKosaCrta >= 0)
+			putanja = putanja.Left(poslednjaKosaCrta + 1);
+
+		return putanja + imeFajla;
+	}
+
+	void crtaj_kaktus(CDC* pDC, LPCTSTR imeFajla)
+	{
+		CString putanja = putanjaDoFajla(imeFajla);
+		HENHMETAFILE hEmf = GetEnhMetaFile(putanja);
 		if (hEmf == NULL)
 			return;
 
@@ -115,12 +122,12 @@ void CLab2View::crtaj_krug(CDC* pDC, int x, int y, int r)
 }
 void CLab2View::crtaj_svetli_kaktus(CDC* pDC)
 {
-	crtaj_kaktus(pDC, IDR_RCDATA4);
+	crtaj_kaktus(pDC, _T("cactus_part_light.emf"));
 }
 
 void CLab2View::crtaj_tamni_kaktus(CDC* pDC)
 {
-	crtaj_kaktus(pDC, IDR_RCDATA5);
+	crtaj_kaktus(pDC, _T("cactus_part.emf"));
 }
 void CLab2View::crtaj_rotiran_tamni_kaktus(CDC* pDC,double angle) {
 	PushTransformacija(pDC);
